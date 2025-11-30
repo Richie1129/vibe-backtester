@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BackTester Frontend Tests</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #0d6efd;
+            padding-bottom: 10px;
+        }
+        .test-suite {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-suite h2 {
+            margin-top: 0;
+            color: #444;
+            font-size: 1.2rem;
+        }
+        .test-case {
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .test-case.pass {
+            background: #d4edda;
+            color: #155724;
+        }
+        .test-case.fail {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .test-case.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .test-icon {
+            font-weight: bold;
+            width: 20px;
+        }
+        .summary {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .summary-stats {
+            display: flex;
+            gap: 30px;
+            font-size: 1.1rem;
+        }
+        .stat-pass { color: #198754; }
+        .stat-fail { color: #dc3545; }
+        .stat-total { color: #333; }
+        .error-details {
+            background: #f8f9fa;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+        }
+        #test-output {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>BackTester Frontend Tests</h1>
+
+    <div class="summary">
+        <h3>測試摘要</h3>
+        <div class="summary-stats">
+            <span class="stat-pass">通過: <span id="pass-count">0</span></span>
+            <span class="stat-fail">失敗: <span id="fail-count">0</span></span>
+            <span class="stat-total">總計: <span id="total-count">0</span></span>
+        </div>
+    </div>
+
+    <div id="test-output"></div>
+
+    <!-- 載入相依套件 -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <!-- Mock API 基礎 URL -->
+    <script>
+        window.API_BASE_URL = 'http://localhost:8000/api';
+    </script>
+
+    <!-- 載入應用程式模組 -->
+    <script src="../js/api.js"></script>
+    <script src="../js/charts.js"></script>
+
+    <!-- 測試框架 -->
+    <script src="test-framework.js"></script>
+
+    <!-- 測試檔案 -->
+    <script src="test-api.js"></script>
+    <script src="test-charts.js"></script>
+    <script src="test-utils.js"></script>
+
+    <!-- 執行測試 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            TestRunner.runAll();
+        });
+    </script>
+</body>
+</html>

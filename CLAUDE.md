@@ -26,6 +26,7 @@
 
 ### 開發工具
 - **版本控制**: Git
+- **Python 環境管理**: uv（虛擬環境目錄：`.venv`）
 - **API 測試**: FastAPI 自動生成的 Swagger UI
 - **瀏覽器**: Chrome DevTools
 
@@ -727,18 +728,30 @@ def test_invalid_stock():
 
 ### 開發環境
 
+**重要**: 本專案使用 `uv` 進行 Python 環境管理。在安裝或使用任何套件之前，必須先啟用虛擬環境。
+
 ```bash
 # Backend
 cd backend
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-pip install -r requirements.txt
+
+# 啟用虛擬環境（每次開新終端機都要執行）
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+
+# 安裝依賴套件（使用 uv）
+uv pip install -r requirements.txt
+
+# 啟動開發伺服器
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
 # Frontend
 cd frontend
 python -m http.server 8080
 ```
+
+**注意事項**:
+- 虛擬環境目錄為 `.venv`（不是 `venv`）
+- 使用 `uv pip install` 而非 `pip install` 以獲得更快的安裝速度
+- 若尚未建立環境，可使用 `uv venv` 建立
 
 ### 生產環境建議
 

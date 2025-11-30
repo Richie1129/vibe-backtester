@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BackTester - 投資回測系統</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- 導航列 -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-graph-up-arrow me-2"></i>BackTester
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#intro">說明</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#stock-selection">選擇標的</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#parameters">設定參數</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#results">回測結果</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要內容 -->
+    <main class="container py-4">
+        <!-- 1. 專案說明區 -->
+        <section id="intro" class="mb-5">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center py-5">
+                    <h1 class="display-5 fw-bold text-primary mb-3">
+                        <i class="bi bi-graph-up-arrow me-2"></i>投資回測系統
+                    </h1>
+                    <p class="lead text-muted mb-4">
+                        比較不同投資標的的歷史績效，用數據回答「投資台積電好」、「0050 比較穩」、「QQQ 才是王道」
+                    </p>
+                    <div class="row justify-content-center">
+                        <div class="col-md-8">
+                            <div class="d-flex flex-wrap justify-content-center gap-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                    <span>支援台股、美股</span>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                    <span>單筆投資 / 定期定額</span>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                    <span>完整財務指標分析</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. 標的選擇區 -->
+        <section id="stock-selection" class="mb-5">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-search me-2"></i>選擇投資標的
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- 搜尋框 -->
+                    <div class="row mb-4">
+                        <div class="col-md-8">
+                            <div class="position-relative">
+                                <input type="text"
+                                       id="stock-search"
+                                       class="form-control form-control-lg"
+                                       placeholder="輸入股票代碼或名稱搜尋（如：2330、台積電、AAPL）"
+                                       autocomplete="off">
+                                <div id="search-results" class="search-results-dropdown"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-grid">
+                                <button id="add-stock-btn" class="btn btn-primary btn-lg" disabled>
+                                    <i class="bi bi-plus-circle me-1"></i>新增
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 快速新增按鈕 -->
+                    <div class="mb-4">
+                        <label class="form-label text-muted">快速新增熱門標的：</label>
+                        <div class="d-flex flex-wrap gap-2" id="quick-add-buttons">
+                            <button class="btn btn-outline-secondary quick-add-btn" data-symbol="2330.TW" data-name="台積電">
+                                台積電
+                            </button>
+                            <button class="btn btn-outline-secondary quick-add-btn" data-symbol="0050.TW" data-name="元大台灣50">
+                                0050
+                            </button>
+                            <button class="btn btn-outline-secondary quick-add-btn" data-symbol="0056.TW" data-name="元大高股息">
+                                0056
+                            </button>
+                            <button class="btn btn-outline-secondary quick-add-btn" data-symbol="QQQ" data-name="Invesco QQQ">
+                                QQQ
+                            </button>
+                            <button class="btn btn-outline-secondary quick-add-btn" data-symbol="SPY" data-name="SPDR S&P 500">
+                                SPY
+                            </button>
+                            <button class="btn btn-outline-secondary quick-add-btn" data-symbol="AAPL" data-name="Apple">
+                                AAPL
+                            </button>
+                            <button class="btn btn-outline-secondary quick-add-btn" data-symbol="NVDA" data-name="NVIDIA">
+                                NVDA
+                            </button>
+                            <button class="btn btn-outline-secondary quick-add-btn" data-symbol="TSM" data-name="台積電ADR">
+                                TSM
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 已選標的列表 -->
+                    <div id="selected-stocks-container">
+                        <label class="form-label">已選擇的標的：</label>
+                        <div id="selected-stocks" class="d-flex flex-wrap gap-2">
+                            <span class="text-muted" id="no-stocks-message">尚未選擇任何標的</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. 參數設定區 -->
+        <section id="parameters" class="mb-5">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-sliders me-2"></i>回測參數設定
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form id="backtest-form">
+                        <div class="row g-4">
+                            <!-- 日期範圍 -->
+                            <div class="col-md-6">
+                                <label for="start-date" class="form-label">起始日期</label>
+                                <input type="date" class="form-control" id="start-date" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="end-date" class="form-label">結束日期</label>
+                                <input type="date" class="form-control" id="end-date" required>
+                            </div>
+
+                            <!-- 投資策略 -->
+                            <div class="col-md-6">
+                                <label for="strategy" class="form-label">投資策略</label>
+                                <select class="form-select" id="strategy" required>
+                                    <option value="lump_sum">單筆投資</option>
+                                    <option value="dca">定期定額</option>
+                                </select>
+                            </div>
+
+                            <!-- 投資金額 -->
+                            <div class="col-md-6">
+                                <label for="amount" class="form-label">
+                                    <span id="amount-label">投資金額</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control" id="amount"
+                                           min="1000" step="1000" value="100000" required>
+                                </div>
+                                <div class="form-text" id="amount-hint">單筆投入的總金額</div>
+                            </div>
+
+                            <!-- 投資頻率（僅定期定額顯示） -->
+                            <div class="col-md-6" id="frequency-group" style="display: none;">
+                                <label for="frequency" class="form-label">投資頻率</label>
+                                <select class="form-select" id="frequency">
+                                    <option value="monthly">每月</option>
+                                    <option value="weekly">每週</option>
+                                </select>
+                            </div>
+
+                            <!-- 執行按鈕 -->
+                            <div class="col-12">
+                                <hr class="my-4">
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <button type="button" class="btn btn-outline-secondary" id="reset-btn">
+                                        <i class="bi bi-arrow-counterclockwise me-1"></i>重設
+                                    </button>
+                                    <button type="submit" class="btn btn-primary btn-lg px-5" id="run-backtest-btn" disabled>
+                                        <i class="bi bi-play-fill me-1"></i>執行回測
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Loading 狀態 -->
+        <div id="loading-overlay" class="loading-overlay" style="display: none;">
+            <div class="text-center">
+                <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="text-muted">正在執行回測，請稍候...</p>
+            </div>
+        </div>
+
+        <!-- 4. 結果顯示區 -->
+        <section id="results" class="mb-5" style="display: none;">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-bar-chart-line me-2"></i>回測結果
+                    </h5>
+                    <button class="btn btn-outline-primary btn-sm" id="export-btn">
+                        <i class="bi bi-download me-1"></i>匯出報告
+                    </button>
+                </div>
+                <div class="card-body">
+                    <!-- 摘要卡片 -->
+                    <div class="row g-3 mb-4" id="summary-cards">
+                        <div class="col-md-3">
+                            <div class="card bg-light border-0">
+                                <div class="card-body text-center">
+                                    <h6 class="text-muted mb-1">最佳表現</h6>
+                                    <h4 class="mb-0 text-success" id="best-performer">-</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-light border-0">
+                                <div class="card-body text-center">
+                                    <h6 class="text-muted mb-1">最高報酬率</h6>
+                                    <h4 class="mb-0 text-primary" id="highest-return">-</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-light border-0">
+                                <div class="card-body text-center">
+                                    <h6 class="text-muted mb-1">最低風險</h6>
+                                    <h4 class="mb-0 text-info" id="lowest-risk">-</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-light border-0">
+                                <div class="card-body text-center">
+                                    <h6 class="text-muted mb-1">最佳夏普比率</h6>
+                                    <h4 class="mb-0 text-warning" id="best-sharpe">-</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 結果表格 -->
+                    <div class="table-responsive mb-4">
+                        <table class="table table-hover" id="results-table">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>標的</th>
+                                    <th class="text-end">總投入</th>
+                                    <th class="text-end">最終價值</th>
+                                    <th class="text-end">總報酬率</th>
+                                    <th class="text-end">年化報酬率</th>
+                                    <th class="text-end">最大回撤</th>
+                                    <th class="text-end">波動率</th>
+                                    <th class="text-end">夏普比率</th>
+                                </tr>
+                            </thead>
+                            <tbody id="results-tbody">
+                                <!-- 動態填入 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 圖表區 -->
+            <div class="row g-4">
+                <!-- 投資組合價值走勢圖 -->
+                <div class="col-lg-8">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header bg-white">
+                            <h6 class="mb-0">
+                                <i class="bi bi-graph-up me-2"></i>投資組合價值走勢
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="value-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 報酬率比較圖 -->
+                <div class="col-lg-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header bg-white">
+                            <h6 class="mb-0">
+                                <i class="bi bi-bar-chart me-2"></i>報酬率比較
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="return-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 風險指標圖 -->
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-white">
+                            <h6 class="mb-0">
+                                <i class="bi bi-shield-check me-2"></i>風險指標比較
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <canvas id="risk-chart"></canvas>
+                                </div>
+                                <div class="col-md-6">
+                                    <canvas id="drawdown-chart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-light py-4 mt-5">
+        <div class="container text-center">
+            <p class="text-muted mb-1">
+                <i class="bi bi-info-circle me-1"></i>
+                回測結果僅供參考，不構成投資建議。過去績效不代表未來表現。
+            </p>
+            <p class="text-muted small mb-0">
+                BackTester &copy; 2025 | 資料來源：Yahoo Finance
+            </p>
+        </div>
+    </footer>
+
+    <!-- Error Modal -->
+    <div class="modal fade" id="error-modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-exclamation-triangle me-2"></i>錯誤
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="error-message"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <!-- Chart.js Date Adapter -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+
+    <!-- Custom JS -->
+    <script src="js/api.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
