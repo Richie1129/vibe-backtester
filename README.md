@@ -2,6 +2,8 @@
 
 > 用數據說話，驗證你的投資理論
 
+![BackTester 回測結果畫面](image/project_screen.png)
+
 ## 專案簡介
 
 你是否常聽到這些說法？
@@ -21,6 +23,10 @@ BackTester 是一個投資回測系統，讓你可以用歷史數據驗證不同
 - **完整指標**：提供報酬率、最大回撤、夏普比率等專業財務指標
 - **視覺化呈現**：圖表化顯示投資組合價值變化與績效比較
 - **全球市場**：支援美股、台股等主要市場
+
+## 實作計畫
+
+![BackTester 實作計畫](image/project_plan.png)
 
 ## 技術架構
 
@@ -68,8 +74,9 @@ cd vibe-backtester
 #### 2. 啟動後端服務
 ```bash
 cd backend
-pip install -r requirements.txt
-uvicorn main:app --reload
+source ../.venv/bin/activate  # 啟用虛擬環境
+uv pip install -r requirements.txt  # 安裝依賴
+uvicorn main:app --reload --port 8000
 ```
 
 後端 API 將運行在 `http://localhost:8000`
