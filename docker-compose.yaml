@@ -1,0 +1,31 @@
+services:
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: vibe-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount the local code to the container for hot-reloading
+      - ./backend:/app
+      # Anonymous volumes to prevent host directories from overwriting container system files
+      - /app/.venv
+      - /app/__pycache__
+    env_file:
+      - .env
+    environment:
+      - CORS_ORIGINS=http://localhost:8080
+    # Use --reload for development
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    restart: unless-stopped
+
+  frontend:
+    image: nginx:alpine
+    container_name: vibe-frontend
+    ports:
+      - "8080:80"
+    volumes:
+      # Mount frontend files directly to Nginx html directory
+      - ./frontend:/usr/share/nginx/html
+    restart: unless-stopped

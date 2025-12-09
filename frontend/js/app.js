@@ -58,12 +58,32 @@ const App = (function() {
         elements.exportBtn = $('#export-btn');
         elements.errorModal = $('#error-modal');
         elements.errorMessage = $('#error-message');
+        
+        // AI 預測相關元素
+        elements.predictSymbolInput = $('#predict-symbol-input');
+        elements.btnPredict = $('#btn-predict');
+        elements.predictionResultContainer = $('#prediction-result-container');
+        elements.predictionLoading = $('#prediction-loading');
+        elements.predOverallSignal = $('#pred-overall-signal');
+        elements.predOverallScore = $('#pred-overall-score');
+        elements.predTimestamp = $('#pred-timestamp');
+        elements.predSignalsList = $('#pred-signals-list');
     }
 
     /**
      * 綁定事件處理器
      */
     function bindEvents() {
+        // AI 預測按鈕
+        elements.btnPredict.on('click', handlePrediction);
+        
+        // AI 預測輸入框 Enter 鍵
+        elements.predictSymbolInput.on('keypress', function(e) {
+            if (e.which === 13) {
+                handlePrediction();
+            }
+        });
+
         // 股票搜尋（防抖）
         let searchTimeout;
         elements.stockSearch.on('input', function() {
@@ -582,6 +602,101 @@ const App = (function() {
             console.warn('API health check failed:', error.message);
             // 不顯示錯誤，讓使用者在執行回測時才看到錯誤
         }
+    }
+
+    /**
+     * 處理 AI 預測請求
+     */
+    async function handlePrediction() {
+        const symbol = elements.predictSymbolInput.val().trim().toUpperCase();
+        if (!symbol) {
+            showError('請輸入股票代碼');
+            return;
+        }
+
+        // UI 狀態切換
+        elements.btnPredict.prop('disabled', true);
+        elements.predictionResultContainer.hide();
+        elements.predictionLoading.show();
+
+        try {
+            const result = await API.predictStock(symbol);
+            renderPredictionResult(result);
+        } catch (error) {
+            showError(error.message || '預測分析失敗');
+        } finally {
+            elements.btnPredict.prop('disabled', false);
+            elements.predictionLoading.hide();
+        }
+    }
+
+    /**
+     * 渲染預測結果
+     */
+    function renderPredictionResult(result) {
+        // 1. 總體訊號
+        const signalMap = {
+            'BULLISH': { text: '看多 (Bullish)', class: 'text-success', icon: 'bi-graph-up-arrow' },
+            'BEARISH': { text: '看空 (Bearish)', class: 'text-danger', icon: 'bi-graph-down-arrow' },
+            'NEUTRAL': { text: '觀望 (Neutral)', class: 'text-secondary', icon: 'bi-dash-circle' }
+        };
+
+        const signalInfo = signalMap[result.overall_signal] || signalMap['NEUTRAL'];
+        
+        elements.predOverallSignal.text(signalInfo.text)
+            .removeClass('text-success text-danger text-secondary')
+            .addClass(signalInfo.class);
+            
+        elements.predOverallScore.text(result.overall_score.toFixed(2))
+            .removeClass('text-success text-danger text-secondary')
+            .addClass(signalInfo.class);
+            
+        elements.predTimestamp.text(new Date(result.timestamp).toLocaleString());
+
+        // 2. 詳細列表
+        elements.predSignalsList.empty();
+        
+        result.signals.forEach(signal => {
+            const itemSignalInfo = signalMap[signal.signal_type];
+            const sourceName = signal.source === 'FUNDAMENTAL' ? '基本面分析' : 
+                             signal.source === 'SENTIMENT' ? '消息面分析' : signal.source;
+            
+            let extraContent = '';
+            if (signal.news_items && signal.news_items.length > 0) {
+                extraContent = '<div class="mt-2 mb-2"><small class="text-muted">相關新聞:</small><ul class="list-unstyled mt-1">';
+                signal.news_items.forEach(news => {
+                    const colorClass = news.sentiment_label === '利多' ? 'text-success' : 
+                                     news.sentiment_label === '利空' ? 'text-danger' : 'text-muted';
+                    extraContent += `
+                        <li class="mb-1 text-truncate">
+                            <span class="badge bg-light ${colorClass} border me-1">${news.sentiment_label}</span>
+                            <a href="${news.url}" target="_blank" class="text-decoration-none text-dark" title="${news.title}">
+                                ${news.title}
+                            </a>
+                        </li>`;
+                });
+                extraContent += '</ul></div>';
+            }
+
+            const html = `
+                <div class="list-group-item">
+                    <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+                        <h5 class="mb-1">${sourceName}</h5>
+                        <span class="badge rounded-pill ${signal.signal_type === 'BULLISH' ? 'bg-success' : signal.signal_type === 'BEARISH' ? 'bg-danger' : 'bg-secondary'}">
+                            ${itemSignalInfo.text}
+                        </span>
+                    </div>
+                    <p class="mb-1">${signal.reason}</p>
+                    ${extraContent}
+                    <small class="text-muted">
+                        分數: ${signal.score} | 信心指數: ${(signal.confidence * 100).toFixed(0)}%
+                    </small>
+                </div>
+            `;
+            elements.predSignalsList.append(html);
+        });
+
+        elements.predictionResultContainer.fadeIn();
     }
 
     // DOM Ready 時初始化

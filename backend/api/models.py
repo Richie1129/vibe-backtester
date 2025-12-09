@@ -6,6 +6,7 @@ Pydantic 資料模型
 from pydantic import BaseModel, Field, field_validator
 from typing import List, Optional, Literal
 from datetime import date
+from enum import Enum
 
 
 # ============== 股票相關模型 ==============
@@ -130,3 +131,41 @@ class HealthResponse(BaseModel):
 
     status: str = Field(default="healthy", description="服務狀態")
     message: str = Field(default="BackTester API is running", description="訊息")
+
+# ============== AI 預測相關模型 ==============
+
+
+class SignalType(str, Enum):
+    BULLISH = "BULLISH"  # 看多
+    BEARISH = "BEARISH"  # 看空
+    NEUTRAL = "NEUTRAL"  # 觀望
+
+
+class AnalysisSource(str, Enum):
+    FUNDAMENTAL = "FUNDAMENTAL"  # 基本面
+    SENTIMENT = "SENTIMENT"      # 消息面/情緒面
+    TECHNICAL = "TECHNICAL"      # 技術面
+
+
+class NewsItem(BaseModel):
+    title: str
+    url: str
+    sentiment_label: str
+    sentiment_score: float
+
+
+class Signal(BaseModel):
+    source: AnalysisSource
+    signal_type: SignalType
+    score: float = Field(..., ge=-1.0, le=1.0, description="-1.0 (強烈看空) 到 1.0 (強烈看多)")
+    confidence: float = Field(..., ge=0.0, le=1.0, description="信心指數 0.0 到 1.0")
+    reason: str = Field(..., description="人類可讀的理由")
+    news_items: Optional[List[NewsItem]] = Field(None, description="相關新聞列表 (僅消息面)")
+
+
+class PredictionResult(BaseModel):
+    symbol: str
+    timestamp: str
+    overall_signal: SignalType
+    overall_score: float
+    signals: List[Signal]  # 細項分析

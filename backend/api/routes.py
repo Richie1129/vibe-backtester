@@ -19,6 +19,7 @@ from api.models import (
     BacktestComparison,
     PortfolioHistoryEntry,
     HealthResponse,
+    PredictionResult,
 )
 from services.data_service import (
     search_stock,
@@ -30,6 +31,7 @@ from services.backtest_service import (
     backtest_dca,
     compare_results,
 )
+from services.prediction.orchestrator import PredictionOrchestrator
 
 
 router = APIRouter(prefix="/api", tags=["API"])
@@ -163,3 +165,17 @@ async def run_backtest(request: BacktestRequest):
     )
 
     return BacktestResponse(results=results, comparison=comparison)
+
+@router.get("/predict/{symbol}", response_model=PredictionResult)
+async def predict_stock(symbol: str):
+    """
+    AI 預測分析
+
+    結合基本面與消息面進行綜合評分
+    """
+    try:
+        orchestrator = PredictionOrchestrator()
+        result = await orchestrator.predict(symbol.upper())
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"預測分析失敗: {str(e)}")

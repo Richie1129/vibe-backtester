@@ -31,6 +31,9 @@
                         <a class="nav-link" href="#stock-selection">選擇標的</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="#ai-prediction">AI 預測</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="#parameters">設定參數</a>
                     </li>
                     <li class="nav-item">
@@ -142,6 +145,64 @@
                         <div id="selected-stocks" class="d-flex flex-wrap gap-2">
                             <span class="text-muted" id="no-stocks-message">尚未選擇任何標的</span>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2.5 AI 預測區 (新增) -->
+        <section id="ai-prediction" class="mb-5">
+            <div class="card shadow-sm border-info">
+                <div class="card-header bg-info bg-opacity-10">
+                    <h5 class="mb-0 text-info-emphasis">
+                        <i class="bi bi-robot me-2"></i>AI 投資預測
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <p class="mb-0 text-muted">
+                                輸入股票代碼，讓 AI 結合基本面與消息面為您進行綜合分析。
+                            </p>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <input type="text" id="predict-symbol-input" class="form-control" placeholder="例如: AAPL">
+                                <button class="btn btn-info text-white" type="button" id="btn-predict">
+                                    <i class="bi bi-magic me-1"></i>開始分析
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 預測結果顯示區 -->
+                    <div id="prediction-result-container" class="mt-4" style="display: none;">
+                        <hr>
+                        <div class="row">
+                            <!-- 總體評分 -->
+                            <div class="col-md-4 text-center border-end">
+                                <h6 class="text-muted">總體訊號</h6>
+                                <h2 id="pred-overall-signal" class="fw-bold mb-2">--</h2>
+                                <div class="display-4 fw-bold mb-2" id="pred-overall-score">0.0</div>
+                                <span class="badge bg-secondary" id="pred-timestamp">--</span>
+                            </div>
+                            
+                            <!-- 詳細分析 -->
+                            <div class="col-md-8">
+                                <h6 class="text-muted mb-3">詳細分析報告</h6>
+                                <div id="pred-signals-list" class="list-group list-group-flush">
+                                    <!-- 動態插入 -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Loading -->
+                    <div id="prediction-loading" class="text-center py-4" style="display: none;">
+                        <div class="spinner-border text-info" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2 text-muted">AI 正在分析財報與新聞數據...</p>
                     </div>
                 </div>
             </div>

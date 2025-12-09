@@ -123,13 +123,22 @@ const API = (function() {
         return await request(`${BASE_URL}/health`);
     }
 
-    // 公開 API
+    /**
+     * 執行 AI 預測分析
+     * @param {string} symbol - 股票代碼
+     * @returns {Promise<Object>} - 預測結果
+     */
+    async function predictStock(symbol) {
+        return request(`${BASE_URL}/predict/${symbol}`);
+    }
+
+    // 公開介面
     return {
         searchStocks,
         getStockInfo,
         runBacktest,
+        predictStock,
         checkHealth,
-        BASE_URL,
     };
 })();
 
